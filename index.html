@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <div class="Header">
+        <div class="logo_image" > <img src="https://1up.health/static/images/1uphealth-white-logo.svg" alt="1UpHealth Logo"/> </div>
+        <h1 class="Header-comp">Customer Notification Tool</h1>
+        <div class="Header-comp" id="Nav-Bar"> 
+            <button onClick={handleClickHome}>Home</button>
+            <button onClick={handleClickDirectory}>Platform</button>
+            <button onClick={handleClickMens}>Who Serve</button>
+            <button onClick={handleClickWomens}>Knowledge</button>
+            <button onClick={handleClickNeutral}>About Us</button>
+        </div>
+    </div>
+
+</head>
+
+<body>
+    <!-- 1. the action is the url where we're posting the information to -->
+    <!-- 2. Make a post request to the url under "action" -->
+    <!-- 3. Post data: posts the data enclosed in the form in the request body -->
+
+
+    <!-- KEY POINTS: 
+            1. MAKE SURE to put the name variable in each input field otherwise
+               these inputs are not going to show up when you send it to the 
+               server using the middleware 
+            
+            2. 
+            
+    -->
+
+    <form id="segmentForm" className="form">
+
+        <div class="form-group"> 
+            <div className="segments">
+
+                <label class="container" for="vehicle1"> 
+                    <input name="client-segment" type="checkbox" id="segment1" value='0'>
+                    Segment 1
+                    <span class="checkmark"></span>
+                </label>
+    
+                <label class="container" for="vehicle2"> 
+                    <input name="client-segment" type="checkbox" id="segment2" value='0' >
+                    Segment 2
+                    <span class="checkmark"></span>
+                </label>
+    
+                <label class="container"for="vehicle3"> 
+                    <input name="client-segment"type="checkbox" id="segment3" value='0' >
+                    Segment 3
+                    <span class="checkmark"></span>
+                </label><br>
+
+            </div>
+    
+            <div className="textbox">
+                <textarea name="subject "id="subject" rows="1" cols="50" placeholder="subject..."></textarea>
+    
+                <textarea name="text-body" id="message" rows="6" cols="50" placeholder="Put your message here..."></textarea>
+        
+                <input name="button" id="send-button" type="submit" value="Send">
+    
+            
+            </div>
+        </div>
+        
+    </form>
+
+</body>
+
+
+<script>
+    $(document).ready(function(){
+
+        console.log("Right after document.ready function");
+
+        $('#a1').click(function ()
+        {
+            console.log("In the a3 function!")
+            var thisCheck = $(this);
+            if (thischeck.is (':checked'))
+            {
+                $(this).value = '1';
+            }
+
+            else{
+                $(this).value = '0';
+
+            }
+        });
+
+
+        $('#a2').click(function ()
+        {
+            console.log("In the a2 function!")
+
+            var thisCheck = $(this);
+            if (thischeck.is (':checked'))
+            {
+                $(this).val('1');
+            }
+
+            else{
+                $(this).value('0');
+
+             }
+        });
+
+        $('#a3').click(function ()
+        {
+            console.log("In the a3 function!")
+            var thisCheck = $(this);
+            if (thischeck.is (':checked'))
+            {
+                $(this).val('1');
+            }
+
+            else{
+                $(this).val('0');
+            }
+        });
+
+
+
+
+
+        $('#send-button').click(function(event) {
+            event.preventDefault();
+
+
+            var segment1Check = document.getElementById('segment1').checked;
+            var segment2Check = document.getElementById('segment2').checked;
+            var segment3Check = document.getElementById('segment3').checked;
+
+            //Email content
+            var subject = $("#subject").val();
+            var message = $("#message").val();
+
+
+            console.log("PRINTING VALUES ", segment1Val, segment2Val, segment3Val, subject, message);
+
+            console.log("Checked values: ", segment1Check, segment2Check, segment3Check);
+
+
+            if (segment1Check == true){
+                console.log("UNCHIIIII");
+                $("#segment1").val(1);
+            }
+                
+            if (segment2Check == true){
+                console.log("TACOOOOS");
+                $("#segment2").val(1);
+            }
+            if (segment3Check == true){
+                $("#segment3").val(1);
+
+            }
+   
+
+            // Segments
+            var segment1Val = document.getElementById('segment1').value;
+            var segment2Val = document.getElementById('segment2').value;
+            var segment3Val = document.getElementById('segment3').value;
+
+
+
+            var mailData = {
+                segment1: segment1Val,
+                segment2: segment2Val,
+                segment3: segment3Val,
+                subject:$("#subject").val(),
+                emailBody:$("#message").val()
+            }; //Array 
+
+            $.ajax({
+                url : "http://localhost:8000/",
+                type: "POST",
+                dataType:'json',
+                data : mailData,
+                success: function(data, textStatus, )
+                    {
+                        alert("Email sucessfully sent!")
+                        console.log(data);
+                        console.log(textStatus);
+                    },
+                error: function (data, textStatus, )
+                    {
+                        alert("There was an error, please try again. ", data)
+                    console.log(data);
+                    console.log(textStatus);
+                    }
+                });
+
+                
+                segment1Check = false;
+                segment2Check = false;
+                segment3Check = false;
+
+                subject = " ";
+                message = " ";
+
+
+
+
+        });
+           
+    });
+
+
+
+
+</script>
+
+
+
+
+
+
+</html>
