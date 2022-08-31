@@ -2,6 +2,7 @@
  * Christopher Sasanuma
  * Copyright (c)
  * 8/10/2022
+ * app.js
  */
 
 
@@ -16,7 +17,6 @@ import mongoose from "mongoose";
 
 import User from './models/users.js';
 
-// Imports that I'm not too sure about
 import { allowedNodeEnvironmentFlags } from "process";
 import { clear } from "console";
 
@@ -24,12 +24,11 @@ import { clear } from "console";
 
 
 const __dirname = path.resolve();
-
 const port = 8000;
 
 // Connect to MongoDB
 //Purpose: Connection string to connect to database
-const dbURI = 'mongodb+srv://sasanumac:Jamallavine$0@1uphealth.akcwm6z.mongodb.net/1uphealth?retryWrites=true&w=majority';
+const dbURI = 'MongoDB Database URL';
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
     //Promise: then takes a call back function that is fired when the connection to the db is made
 
@@ -39,6 +38,7 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
             console.log("Port running on http://localhost:" + port);
         }))
     .catch((err) => console.log(err));
+
 
 const app = express();
 app.use(express.static(__dirname +'.public'));
@@ -55,9 +55,9 @@ app.get("/", (request, response)=> {
 // Mongoose and mongo sandbox routes 
 app.get('/add-user', (req, res) => {
     const user = new User({ 
-        userId: "123jdkafds",
-        userName: "christophersasanuma0", 
-        email: "christophersasanuma0@gmail.com", 
+        userId: "EXAMPLE USER ID",
+        userName: "EXAMPLE USER NAME", 
+        email: "EXAMPLE-EMAIL@gmail.com", 
         segment: 1
     });
     user.save()
@@ -83,7 +83,7 @@ app.get('/all-users', (req, res) => {
 
 // Handler for Single User 
 app.get('/single-user', (req, res) => {
-    User.findById("630463ca1bf7e0eadf85c538")
+    User.findById("EXAMPLEID")
     .then((result) => {
         res.send(result)
     })
@@ -92,15 +92,6 @@ app.get('/single-user', (req, res) => {
     });
 });
 
-
-
-
-
-
-
-// app.listen(port, () => {
-//     console.log("Port running on http://localhost:" + port);
-// });
 
 // API Middlware
 app.use(express.json()); //Used to accept the data in JSON format
@@ -115,26 +106,27 @@ app.use(express.urlencoded()); //Used to decode the data sent through html form
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
 app.post('/', (req, res) => {
+
+    /* Example list of emails in each of the three segments */
     const users = 
         {
             'segment1': [
-                "sashasasanuma@gmail.com",
-                "christophersasanuma0@gmail.com"        
+                "EMAIL1@gmail.com",
+                "EMAIL2@gmail.com"        
             ],
-    
+
             'segment2':
             [
-                "nandika.chirala@vanderbilt.edu",
-                "nitinbali2801@gmail.com"
-    
+                "EMAIL3@gmail.com",
+                "EMAIL4@gmail.com"
+
             ],
-    
+
             'segment3': [
-                "nandikachirala@gmail.com",
-                "Alexandra.sasanuma@tufts.edu"
+                "EMAIL4@gmail.com",
+                "EMAIL5@gmail.com"
             ]
         };
-
 
     // Email Message & Segment Boolean value 
     var segment1 = req.body["segment1"];
@@ -171,7 +163,7 @@ app.post('/', (req, res) => {
     var params = {
         Destination: { /* required */
           CcAddresses: [
-            'sasanumac@gmail.com',
+            'EMAIL5@gmail.com',
             /* more items */
           ],
           ToAddresses: emailList
@@ -192,7 +184,7 @@ app.post('/', (req, res) => {
             Data: subject
            }
           },
-        Source: 'sasanumac@gmail.com', /* required */
+        Source: 'SOURCE@gmail.com', /* required */
         ReplyToAddresses: [
           /* more items */
         ],

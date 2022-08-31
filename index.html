@@ -78,11 +78,9 @@
 <script>
     $(document).ready(function(){
 
-        console.log("Right after document.ready function");
 
         $('#a1').click(function ()
         {
-            console.log("In the a3 function!")
             var thisCheck = $(this);
             if (thischeck.is (':checked'))
             {
@@ -98,7 +96,7 @@
 
         $('#a2').click(function ()
         {
-            console.log("In the a2 function!")
+
 
             var thisCheck = $(this);
             if (thischeck.is (':checked'))
@@ -114,7 +112,6 @@
 
         $('#a3').click(function ()
         {
-            console.log("In the a3 function!")
             var thisCheck = $(this);
             if (thischeck.is (':checked'))
             {
@@ -143,18 +140,11 @@
             var message = $("#message").val();
 
 
-            console.log("PRINTING VALUES ", segment1Val, segment2Val, segment3Val, subject, message);
-
-            console.log("Checked values: ", segment1Check, segment2Check, segment3Check);
-
-
             if (segment1Check == true){
-                console.log("UNCHIIIII");
                 $("#segment1").val(1);
             }
                 
             if (segment2Check == true){
-                console.log("TACOOOOS");
                 $("#segment2").val(1);
             }
             if (segment3Check == true){
