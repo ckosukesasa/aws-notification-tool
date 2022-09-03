@@ -14,6 +14,8 @@ import path from 'path';
 import bodyParser from 'body-parser';
 import AWS from "aws-sdk";
 import mongoose from "mongoose";
+import mongodb from 'mongodb';
+const MongoClient = mongodb.MongoClient
 
 import User from './models/users.js';
 
@@ -26,19 +28,34 @@ import { clear } from "console";
 const __dirname = path.resolve();
 const port = 8000;
 
+// List where the JSON Data of the User Emails will be stored 
+var USERS = ""
+
 // Connect to MongoDB
-//Purpose: Connection string to connect to database
-const dbURI = 'MongoDB Database URL';
-mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
-    //Promise: then takes a call back function that is fired when the connection to the db is made
+//Purpose: Insert your 'Connection string' to connect to database
+const dbURI = #MongoDB URI;
 
-    // Key idea: We only want to listen to the app and load the data to a blog 
-    //           when we've made connection to the data base
-    .then((result) => app.listen(port, () => {
-            console.log("Port running on http://localhost:" + port);
-        }))
-    .catch((err) => console.log(err));
+/** Purpose: Connecting to the MongoDB and pulling the data from the database 
+ *           after a connection to the MongoDB is made
+ */
+MongoClient.connect(dbURI, (err, client) =>{
 
+    if(err) throw err;
+
+    app.listen(port, () => {
+        console.log("Port running on http://localhost:" + port);
+    })
+
+    let database = client.db('Database name');
+
+    /** Fetching the list of users from the MongoDB **/
+    database.collection("Collection Name").find({}).toArray(function(err, result) {
+        if (err) throw err;
+        USERS = result
+        client.close();
+      });
+
+})
 
 const app = express();
 app.use(express.static(__dirname +'.public'));
@@ -47,29 +64,16 @@ app.use(cors());
 app.use("/", express.static("public"));
 
 
+
+/** Purpose: Sending the front end HTML file to the front end to render website 
+ *           on user device
+*/
 app.get("/", (request, response)=> {
     response.status(200).sendFile(__dirname + '/index.html');
 });
 
 
-// Mongoose and mongo sandbox routes 
-app.get('/add-user', (req, res) => {
-    const user = new User({ 
-        userId: "EXAMPLE USER ID",
-        userName: "EXAMPLE USER NAME", 
-        email: "EXAMPLE-EMAIL@gmail.com", 
-        segment: 1
-    });
-    user.save()
-      .then((result) => {
-          res.send(result)
-      })
-      .catch((err)=>{
-          console.log(err);
-      });
-});
-
-
+/** Purpose: Get all user information at the given path ** */
 app.get('/all-users', (req, res) => {
     User.find()
       .then((result) => {
@@ -81,7 +85,7 @@ app.get('/all-users', (req, res) => {
   
 })
 
-// Handler for Single User 
+/** Purpose: Get Single user information at the given path ** */
 app.get('/single-user', (req, res) => {
     User.findById("EXAMPLEID")
     .then((result) => {
@@ -105,29 +109,11 @@ app.use(express.urlencoded()); //Used to decode the data sent through html form
 
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
+
+/* Purpose: Fetching User form data from front end, then sending email 
+            to the list of segments that were selectected by the user */
+
 app.post('/', (req, res) => {
-
-    /* Example list of emails in each of the three segments */
-    const users = 
-        {
-            'segment1': [
-                "EMAIL1@gmail.com",
-                "EMAIL2@gmail.com"        
-            ],
-
-            'segment2':
-            [
-                "EMAIL3@gmail.com",
-                "EMAIL4@gmail.com"
-
-            ],
-
-            'segment3': [
-                "EMAIL4@gmail.com",
-                "EMAIL5@gmail.com"
-            ]
-        };
-
     // Email Message & Segment Boolean value 
     var segment1 = req.body["segment1"];
     var segment2 = req.body["segment2"];
@@ -138,22 +124,25 @@ app.post('/', (req, res) => {
 
     var emailList = [];
     if (segment1 == '1'){
+        console.log("Seg 1!!");
         //Get segment 1 user emails from MongoDB, then load to Email list
-        for (var i in users['segment1']){
-            emailList.push(users['segment1'][i]);
+        for (var i in USERS[0]["users"]["segment1"]){
+            emailList.push(USERS[0]["users"]["segment1"][i]["email"]);
         }
     }
     if (segment2 == '1'){
           //Get segment 2 user emails from MongoDB, then load to Email list
-        for (var i in users['segment2']){
-            emailList.push(users['segment2'][i])
+        console.log("Seg 2!!");
+        for (var i in USERS[0]["users"]["segment2"]){
+            emailList.push(USERS[0]["users"]["segment2"][i]["email"]);
         }
     }
 
     if (segment3 == '1'){
+        console.log("Seg 3!!")
         //Get segment 3 user emails from MongoDB, then load to Email list
-        for (var i in users['segment3']){
-            emailList.push(users['segment3'][i]);
+        for (var i in USERS[0]["users"]["segment1"]){
+            emailList.push(USERS[0]["users"]["segment3"][i]["email"]);
         }
     }
 
@@ -163,7 +152,7 @@ app.post('/', (req, res) => {
     var params = {
         Destination: { /* required */
           CcAddresses: [
-            'EMAIL5@gmail.com',
+            'CC EMAIL ADDRESS',
             /* more items */
           ],
           ToAddresses: emailList
@@ -184,7 +173,7 @@ app.post('/', (req, res) => {
             Data: subject
            }
           },
-        Source: 'SOURCE@gmail.com', /* required */
+        Source: 'SOURCE EMAIL ADDRESS', /* required */
         ReplyToAddresses: [
           /* more items */
         ],
